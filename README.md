@@ -33,16 +33,56 @@ Install the required packages listed in Pipfile:
 pipenv install
 ```
 
-### Running the Application
-To run the FastAPI application, use the following command:
-```
-python main.py
-```
-This command will start the FastAPI application on http://127.0.0.1:8888
+### Running the Application without Docker Compose
+If you choose not to use Docker Compose, you need to set up a MySQL container manually and initialize the database.
 
+Steps:
+1. Create a MySQL container:
 
-### Accessing the API Documentation
-FastAPI automatically generates interactive API documentation. You can view it at:
+    Run the following command to start a MySQL container:
+    ```
+    docker run --name some-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -v /path/to/your/local/volume:/var/lib/mysql -d mysql:latest
+    ```
 
-- Swagger UI: http://127.0.0.1:8888/powerplant/v1/docs
+    - --name some-mysql: Names the container.
+    - -p 3306:3306: Maps the MySQL port.
+    - -e MYSQL_ROOT_PASSWORD=my-secret-pw: Sets the MySQL root password.
+    - -v /path/to/your/local/volume:/var/lib/mysql: Mounts a local directory to persist MySQL data.
+    - -d mysql:latest: Uses the latest MySQL image.
+
+2. Create the database and table:
+
+    After the MySQL container is up and running, create the database error_logs and the table tb_error_logs using the SQL commands from the init.sql file.
+
+3. Run the FastAPI application:
+    ```
+    python main.py
+    ```
+
+4. Access the API:
+
+    Once the FastAPI application is running, you can access the API documentation and interact with the endpoints at http://127.0.0.1:8888/powerplant/v1/docs
+
+### Running the Application using Docker Compose
+The preferred method is to use Docker Compose, which simplifies the setup by managing both the application and the MySQL database together.
+
+Steps:
+
+1. Start the services:
+
+    Run the following command to build and start the services defined in the docker-compose.yml file:
+    ```
+    docker-compose up --build
+    ```
+    This command will:
+
+    - Build the Docker image for the application.
+    - Start the MySQL container and initialize it with the init.sql file.
+    - Start the application container.
+
+2. Access the API:
+  
+    Once the containers are up, you can access the API documentation at http://localhost:8888/powerplant/v1/docs
+    
+
 
