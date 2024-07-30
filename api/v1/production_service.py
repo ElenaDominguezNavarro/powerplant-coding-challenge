@@ -1,4 +1,5 @@
 import schemas
+from schemas.power_plant import PlantType
 
 class ProductionService():
     WIND_TURBINE_COST = 0
@@ -14,11 +15,11 @@ class ProductionService():
         fuels = payload.fuels
 
         for plant in payload.powerplants:
-            if plant.type == "windturbine":
+            if plant.type == PlantType.WIND_TURBINE:
                 cost = 0
-            elif plant.type == "gasfired":
+            elif plant.type == PlantType.GAS_FIRED:
                 cost = fuels['gas(euro/MWh)'] / plant.efficiency
-            elif plant.type == "turbojet":
+            elif plant.type == PlantType.TURBOJET:
                 cost = fuels['kerosine(euro/MWh)'] / plant.efficiency
             else:
                 raise ValueError(f"Unknown powerplant type: {plant.type}")
@@ -35,7 +36,7 @@ class ProductionService():
         remaining_load = payload.load
 
         for plant, _ in powerplant_efficiencies:
-            if plant.type == "windturbine":
+            if plant.type == PlantType.WIND_TURBINE:
                 generated = plant.pmax * (fuels['wind(%)'] / 100.0)
             else:
                 if remaining_load <= 0:

@@ -1,10 +1,16 @@
 from pydantic import BaseModel
 
+from enum import Enum
+
+class PlantType(Enum):
+    WIND_TURBINE = "windturbine"
+    GAS_FIRED = "gasfired"
+    TURBOJET = "turbojet"
 
 # Shared properties
 class PowerPlantBase(BaseModel):
     name: str
-    type: str
+    type: PlantType
     efficiency: float
     pmin: float
     pmax: float
@@ -12,7 +18,7 @@ class PowerPlantBase(BaseModel):
 # Properties to return to client
 class PowerPlant(PowerPlantBase):
     name: str
-    type: str
+    type: PlantType
     efficiency: float
     pmin: float
     pmax: float
