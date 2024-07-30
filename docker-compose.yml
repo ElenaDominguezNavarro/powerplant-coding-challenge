@@ -1,0 +1,21 @@
+version: '3.12'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8888:8888"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql+mysqlconnector://root:my-secret-pw@db:3306/error_logs
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: error_logs
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
