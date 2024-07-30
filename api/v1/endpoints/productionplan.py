@@ -1,28 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from typing import List
+from api.v1.production_service import ProductionService
 
 import schemas
 
-
 router = APIRouter()
 
-class ResponseItem(BaseModel):
-    name: str
-    p: float
-
-
-@router.post("/")
+@router.post("/", response_model=List[schemas.ResponseItem])
 async def production_plan(payload: schemas.Payload):
     try:
-        print(f"Load: {payload.load}")
-        print("Fuels:")
-        for fuel, price in payload.fuels.items():
-            print(f"  {fuel}: {price}")
-        print("Powerplants:")
-        for plant in payload.powerplants:
-            print(f"  Name: {plant.name}, Type: {plant.type}, Efficiency: {plant.efficiency}, Pmin: {plant.pmin}, Pmax: {plant.pmax}")
-        return payload
+        production_service = ProductionService()
+        response = production_service.calculate_production_plan(payload)
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
+    
