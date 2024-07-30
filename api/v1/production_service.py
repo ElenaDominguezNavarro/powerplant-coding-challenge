@@ -1,16 +1,23 @@
 import schemas
 from schemas.power_plant import PlantType
+from crud.error_logs import error_logs
+from fastapi import Depends
+from datetime import datetime
+from sqlalchemy.orm import Session
+
 
 class ProductionService():
     WIND_TURBINE_COST = 0
-    def calculate_production_plan(self, payload: schemas.Payload):
+
+    async def calculate_production_plan(self, payload: schemas.Payload, db: Session):
         
-        powerplant_efficiencies = self.get_powerplant_costs(payload)
-        result = self.get_energy_generation(payload, powerplant_efficiencies)
+        powerplant_efficiencies = await self.get_powerplant_costs(payload, db)
+        result = await self.get_energy_generation(payload, powerplant_efficiencies, db)
 
         return result
     
-    def get_powerplant_costs(self, payload: schemas.Payload):
+    async def get_powerplant_costs(self, payload: schemas.Payload, db: Session):
+
         powerplant_efficiencies = []
         fuels = payload.fuels
 
@@ -22,7 +29,9 @@ class ProductionService():
             elif plant.type == PlantType.TURBOJET:
                 cost = fuels['kerosine(euro/MWh)'] / plant.efficiency
             else:
-                raise ValueError(f"Unknown powerplant type: {plant.type}")
+                error_message = f"Unknown powerplant type: {plant.type}"
+                await self.create_error_log(db, error_message)
+                raise ValueError(error_message)
             
             powerplant_efficiencies.append((plant, cost))
         
@@ -30,11 +39,12 @@ class ProductionService():
         
         return powerplant_efficiencies
     
-    def get_energy_generation(self, payload: schemas.Payload, powerplant_efficiencies):
+    async def get_energy_generation(self, payload: schemas.Payload, powerplant_efficiencies, db: Session):
+
         response = []
         fuels = payload.fuels
         remaining_load = payload.load
-
+        
         for plant, _ in powerplant_efficiencies:
             if plant.type == PlantType.WIND_TURBINE:
                 generated = plant.pmax * (fuels['wind(%)'] / 100.0)
@@ -50,5 +60,12 @@ class ProductionService():
             response.append(schemas.ResponseItem(name=plant.name, p=round(generated, 1)))
         
         if remaining_load > 0:
-            raise ValueError("There is not enough capacity to cover the load")
+            error_message = "There is not enough capacity to cover the load"
+            await self.create_error_log(db, error_message)
+            raise ValueError(error_message)
         return response
+    
+    async def create_error_log(self, db, error_message):
+        
+        error = schemas.ErrorLogsCreate(error_message=error_message, timestamp=datetime.now())
+        await error_logs.create_error_log(db, error)

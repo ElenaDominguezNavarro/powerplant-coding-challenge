@@ -1,16 +1,20 @@
 from typing import Optional
-
+from datetime import datetime
 from pydantic import BaseModel
+from typing import Union
 
 
 # Shared properties
 class ErrorLogsBase(BaseModel):
-    #TODO
-    pass
+    id: Union[int, None] = None
+    timestamp: Union[datetime, None] = None
+    error_message: Union[str, None] = None
 
 
 # Properties to receive on item creation
 class ErrorLogsCreate(ErrorLogsBase):
+    error_message: str
+    timestamp: datetime
     pass
 
 
