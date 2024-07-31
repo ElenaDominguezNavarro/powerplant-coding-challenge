@@ -32,6 +32,13 @@ Install the required packages listed in Pipfile:
 ```
 pipenv install
 ```
+
+### Activate the Virtual Environment
+Activate the virtual environment with:
+```
+pipenv shell
+```
+
 ## Running the Application
 
 ### Running the Application without Docker Compose
