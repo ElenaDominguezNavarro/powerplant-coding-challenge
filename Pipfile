@@ -36,6 +36,7 @@ urllib3 = "==1.26.2"
 python-dotenv = "==1.0.0"
 python-keycloak = ">=2.6.0"
 uvicorn = {extras = ["standard"], version = "*"}
+pytest = "*"
 
 [dev-packages]
 

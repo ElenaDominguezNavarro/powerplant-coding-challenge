@@ -30,3 +30,4 @@ urllib3==1.26.2
 uvicorn>=0.15.0,<0.16.0
 python-dotenv==1.0.0
 python-keycloak>=2.6.0
+pytest==8.3.2
