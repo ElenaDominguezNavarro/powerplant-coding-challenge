@@ -1,13 +1,13 @@
 import schemas
 from schemas.power_plant import PlantType
 from crud.error_logs import error_logs
-from fastapi import Depends
 from datetime import datetime
 from sqlalchemy.orm import Session
 
 
 class ProductionService():
     WIND_TURBINE_COST = 0
+    CO2_EMISSION_PER_MWH = 0.3
 
     async def calculate_production_plan(self, payload: schemas.Payload, db: Session):
         
@@ -26,6 +26,7 @@ class ProductionService():
                 cost = 0
             elif plant.type == PlantType.GAS_FIRED:
                 cost = fuels['gas(euro/MWh)'] / plant.efficiency
+                cost += (fuels['co2(euro/ton)'] * self.CO2_EMISSION_PER_MWH)
             elif plant.type == PlantType.TURBOJET:
                 cost = fuels['kerosine(euro/MWh)'] / plant.efficiency
             else:
