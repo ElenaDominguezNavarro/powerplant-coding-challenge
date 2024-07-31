@@ -32,6 +32,7 @@ Install the required packages listed in Pipfile:
 ```
 pipenv install
 ```
+## Running the Application
 
 ### Running the Application without Docker Compose
 If you choose not to use Docker Compose, you need to set up a MySQL container manually and initialize the database.
@@ -84,5 +85,9 @@ Steps:
   
     Once the containers are up, you can access the API documentation at http://localhost:8888/powerplant/v1/docs
     
-
+## Running Tests
+The project uses pytest for running the tests. To execute all tests, run:
+```
+pytest
+```
 
